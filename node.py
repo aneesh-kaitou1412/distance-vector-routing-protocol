@@ -49,11 +49,16 @@ class Node:
 		print("")
 	
 	def receive_routing_table(self, node, routing_table):
-		for k in routing_table:
-			if routing_table[k]['distance'] + self.routing_table[node]['distance'] < self.routing_table[k]['distance']:
-				self.routing_table[k]['distance'] = routing_table[k]['distance'] + self.routing_table[node]['distance']
-				self.routing_table[k]['next_hop'] = self.routing_table[node]['next_hop']
-				self.updated = True
+		while True:
+			flag = True
+			for k in routing_table:
+				if routing_table[k]['distance'] + self.routing_table[node]['distance'] < self.routing_table[k]['distance']:
+					flag = False
+					self.routing_table[k]['distance'] = routing_table[k]['distance'] + self.routing_table[node]['distance']
+					self.routing_table[k]['next_hop'] = self.routing_table[node]['next_hop']
+					self.updated = True
+			if flag:
+				break
 
 	def send_routing_table(self):
 		if self.updated:
