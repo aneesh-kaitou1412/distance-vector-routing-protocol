@@ -70,13 +70,10 @@ class Node:
 
 	async def send_routing_table(self):
 		if self.updated:
-			tasks = []
-			for node in self.neighbours:
-				tasks.append(asyncio.create_task(self.send_individual_routing_table(node)))
 			self.updated = False
-			await asyncio.gather(*tasks)
-			
-
+			for node in self.neighbours:
+				task = asyncio.create_task(self.send_individual_routing_table(node))
+				await task
 
 """ Test """
 nodelist = [0, 1, 2, 3, 4]
@@ -95,14 +92,13 @@ async def simulation():
 	while any(nodes[i].updated for i in nodelist):
 		iterations += 1
 		print(f"Iteration {iterations}")
-		tasks = []
-		for i in nodelist:
-			tasks.append(asyncio.create_task(nodes[i].send_routing_table()))
 
 		started_at = time.monotonic()
-		await asyncio.gather(*tasks)
+		for i in nodelist:
+			task = asyncio.create_task(nodes[i].send_routing_table())
+			await task
 		total_message_time = time.monotonic() - started_at
-		
+
 		print(f"Time taken for all messages : {total_message_time}")
 			
 asyncio.run(simulation())
